@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/pkg/errors"
+	"github.com/smartcontractkit/chainlink/core/static"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -71,8 +72,7 @@ func CreateLogger(zl *zap.SugaredLogger) *Logger {
 
 // CreateProductionLogger returns a log config for the passed directory
 // with the given LogLevel and customizes stdout for pretty printing.
-func CreateProductionLogger(
-	dir string, jsonConsole bool, lvl zapcore.Level, toDisk bool) *Logger {
+func CreateProductionLogger(dir string, jsonConsole bool, lvl zapcore.Level, toDisk bool, devMode bool) *Logger {
 	config := zap.NewProductionConfig()
 	if !jsonConsole {
 		config.OutputPaths = []string{"pretty://console"}
@@ -88,7 +88,11 @@ func CreateProductionLogger(
 	if err != nil {
 		log.Fatal(err)
 	}
+	sugaredLogger := zl.Sugar()
+	if !devMode {
+		sugaredLogger = sugaredLogger.With("CLInstanceID", static.InstanceUUID, "CLVersion", static.Version, "CLSHA", static.Sha)
+	}
 	return &Logger{
-		SugaredLogger: zl.Sugar(),
+		SugaredLogger: sugaredLogger,
 	}
 }
