@@ -33,7 +33,7 @@ func buildPrettyVersion() string {
 	if Version == "unset" {
 		return " "
 	}
-	return fmt.Sprintf(" %s@%s ", Version, Sha)
+	return fmt.Sprintf(" %s ", Version)
 }
 
 // SetConsumerName sets a nicely formatted application_name on the
